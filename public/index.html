@@ -3,81 +3,248 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Web プロキシ</title>
+<title>Proxy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
+  :root {
+    --bg: #0a0b0e;
+    --surface: #131519;
+    --line: #23262c;
+    --text: #eceef1;
+    --text-dim: #767c87;
+    --accent: #e8a13d;
+    --accent-dim: rgba(232, 161, 61, 0.14);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    height: 100%;
+  }
+
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background: #0f172a;
-    color: #e2e8f0;
+    background: var(--bg);
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 42px 42px;
+    background-position: center;
+    color: var(--text);
+    font-family: 'Zen Kaku Gothic New', sans-serif;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100vh;
-    margin: 0;
+    min-height: 100vh;
+    padding: 24px;
   }
-  .card {
-    background: #1e293b;
-    padding: 2.5rem;
-    border-radius: 16px;
-    width: 90%;
-    max-width: 480px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+
+  .wrap {
+    width: 100%;
+    max-width: 460px;
   }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    display: inline-block;
+    border-radius: 1px;
+  }
+
   h1 {
-    font-size: 1.4rem;
-    margin-bottom: 0.5rem;
+    font-size: 1.9rem;
+    line-height: 1.4;
+    font-weight: 700;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
   }
+
   p.desc {
-    color: #94a3b8;
-    font-size: 0.9rem;
-    margin-bottom: 1.5rem;
+    color: var(--text-dim);
+    font-size: 0.92rem;
+    line-height: 1.7;
+    margin: 0 0 36px;
   }
+
+  /* signature element: route indicator */
+  .route {
+    display: flex;
+    align-items: center;
+    margin-bottom: 36px;
+  }
+
+  .node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .node-dot {
+    width: 9px;
+    height: 9px;
+    border: 1.5px solid var(--text-dim);
+    border-radius: 50%;
+    background: var(--bg);
+  }
+
+  .node.mid .node-dot {
+    border-color: var(--accent);
+    background: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-dim);
+  }
+
+  .node-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.14em;
+    color: var(--text-dim);
+  }
+
+  .node.mid .node-label { color: var(--accent); }
+
+  .track {
+    flex: 1;
+    height: 1px;
+    position: relative;
+    background-image: repeating-linear-gradient(90deg, var(--line) 0 4px, transparent 4px 8px);
+    margin: 0 6px;
+    top: -8px;
+  }
+
+  .track .pulse {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 4px;
+    height: 4px;
+    background: var(--accent);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: travel 2.6s ease-in-out infinite;
+    box-shadow: 0 0 6px var(--accent);
+  }
+
+  .track.b .pulse { animation-delay: 1.3s; }
+
+  @keyframes travel {
+    0% { left: 0%; opacity: 0; }
+    12% { opacity: 1; }
+    88% { opacity: 1; }
+    100% { left: 100%; opacity: 0; }
+  }
+
   form {
     display: flex;
-    gap: 0.5rem;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    border-radius: 3px;
+    overflow: hidden;
+    transition: border-color 0.15s ease;
   }
+
+  form:focus-within {
+    border-color: var(--accent);
+  }
+
+  .protocol {
+    display: flex;
+    align-items: center;
+    padding: 0 4px 0 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    user-select: none;
+  }
+
   input {
     flex: 1;
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    border: 1px solid #334155;
-    background: #0f172a;
-    color: #e2e8f0;
-    font-size: 1rem;
-  }
-  input:focus { outline: 2px solid #6366f1; }
-  button {
-    padding: 0.75rem 1.25rem;
-    border-radius: 8px;
+    padding: 15px 6px;
     border: none;
-    background: #6366f1;
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
+    background: transparent;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    min-width: 0;
   }
-  button:hover { background: #4f46e5; }
+
+  input::placeholder { color: #464b54; }
+  input:focus { outline: none; }
+
+  button {
+    padding: 0 22px;
+    border: none;
+    border-left: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: color 0.15s ease, background 0.15s ease;
+  }
+
+  button:hover {
+    color: var(--bg);
+    background: var(--accent);
+  }
+
   .note {
-    margin-top: 1rem;
-    font-size: 0.78rem;
-    color: #64748b;
+    margin-top: 22px;
+    font-size: 11.5px;
+    line-height: 1.7;
+    color: #4a4f58;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pulse { animation: none !important; }
   }
 </style>
 </head>
 <body>
-  <div class="card">
-    <h1>🌐 Web プロキシ</h1>
-    <p class="desc">閲覧したいサイトのURLを入力してください</p>
+  <div class="wrap">
+    <div class="eyebrow">route relay</div>
+    <h1>行き先のURLを入れるだけ。</h1>
+    <p class="desc">このページを経由してサイトを開きます。アドレスバーにそのまま入力してください。</p>
+
+    <div class="route">
+      <div class="node"><span class="node-dot"></span><span class="node-label">YOU</span></div>
+      <div class="track a"><span class="pulse"></span></div>
+      <div class="node mid"><span class="node-dot"></span><span class="node-label">RELAY</span></div>
+      <div class="track b"><span class="pulse"></span></div>
+      <div class="node"><span class="node-dot"></span><span class="node-label">SITE</span></div>
+    </div>
+
     <form onsubmit="go(event)">
-      <input type="text" id="url" placeholder="example.com" autofocus>
+      <span class="protocol">https://</span>
+      <input type="text" id="url" placeholder="example.com" autocomplete="off" autofocus>
       <button type="submit">開く</button>
     </form>
-    <p class="note">個人利用を想定した簡易プロキシです。アクセス先サイトの利用規約は遵守してください。</p>
+
+    <p class="note">アクセス先の利用規約・著作権・各種法令を守ってご利用ください。ログインが必要なサイトや動画配信サイトなど、正しく表示されない場合があります。</p>
   </div>
 
   <script>
     function go(e) {
       e.preventDefault();
-      let url = document.getElementById('url').value.trim();
+      const field = document.getElementById('url');
+      let url = field.value.trim();
       if (!url) return;
       if (!/^https?:\/\//i.test(url)) {
         url = 'https://' + url;
